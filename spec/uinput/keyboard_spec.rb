@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Uinput::Device do
+describe UInput::Device do
   it 'has a version number' do
-    expect(Uinput::Device::VERSION).not_to be nil
+    expect(UInput::Device::VERSION).not_to be nil
   end
 
   it 'does something useful' do

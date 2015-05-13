@@ -1,13 +1,8 @@
-require_relative '../device'
-
-module Uinput
+module UInput
   class Device
     class Factory
       def initialize(device, &block)
-        @fd = IO.sysopen(device, Fcntl::O_WRONLY | Fcntl::O_NDELAY)
-        if @fd.nil?
-          raise "Uinput device #{device} does not exist."
-        end
+        @file = File.open(device, Fcntl::O_WRONLY | Fcntl::O_NDELAY)
         @device = UinputUserDev.new
 
         self.name = "Virtual Ruby Device"
@@ -16,46 +11,52 @@ module Uinput
         self.product = 0
         self.version = 0
 
-        instance_exec &block if block
-      end
+        receive_syn_events
 
-      def type=(type)
-        @device[:id][:bustype] = type
+        instance_exec &block if block
       end
 
       def name=(name)
         @device[:name] = name
       end
 
+      def type=(type)
+        @device[:id][:bustype] = type
+      end
+
       def vendor=(vendor)
-        @device[:vendor] = vendor
+        @device[:id][:vendor] = vendor
       end
 
       def product=(product)
-        @device[:product] = product
+        @device[:id][:product] = product
       end
 
       def version=(version)
-        @device[:version] = version
+        @device[:id][:version] = version
       end
 
       def add_key(key)
-        @fd.ioctl(UI_SET_KEYBIT, key)
+        @file.ioctl(UI_SET_KEYBIT, key)
       end
       alias_method :add_button, :add_key
 
       def add_event(event)
-        @fd.ioctl(UI_SET_EVBIT, event)
+        @file.ioctl(UI_SET_EVBIT, event)
       end
 
       def receive_key_events
         add_event(EV_KEY)
       end
 
+      def receive_syn_events
+        add_event(EV_SYN)
+      end
+
       def create
-        @fd.write(@device)
-        if @fd.ioctl(UI_DEV_CREATE).zero?
-          @fd
+        @file.syswrite(@device.pointer.read_bytes(@device.size))
+        if @file.ioctl(UI_DEV_CREATE).zero?
+          @file
         end
       end
     end

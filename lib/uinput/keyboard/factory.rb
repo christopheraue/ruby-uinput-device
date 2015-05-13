@@ -1,5 +1,5 @@
-module Uinput
-  class Keyboard
+module UInput
+  class Keyboard < Device
     class Factory < Device::Factory
       def initialize(*args, &block)
         super
@@ -8,7 +8,7 @@ module Uinput
       end
 
       def add_all_keys
-        0..KEY_MAX.each{ |key| add_key(key) }
+        (0..KEY_MAX).each{ |key| add_key(key) }
       end
     end
   end

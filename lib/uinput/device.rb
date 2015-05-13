@@ -1,23 +1,44 @@
-require "uinput/device/version"
+require 'uinput'
+require_relative "device/version"
+require_relative "device/factory"
 
-module Uinput
+module UInput
   class Device
-    def self.create(device = '/dev/uinput', &block)
-      fd = self.class::Factory.new(device, &block).create
-      new fd unless fd.nil?
+    class << self
+      def create(device = '/dev/uinput', &block)
+        file = self::Factory.new(device, &block).create
+        new file unless file.nil?
+      end
     end
 
-    def initialize(fd)
-      @fd = fd
+    def initialize(file)
+      @file = file
     end
 
     def destroy
-      @fd.ioctl(UI_DEV_DESTROY)
-      @fd = nil
+      @file.ioctl(UI_DEV_DESTROY, nil)
+      @file = nil
     end
 
     def active?
-      not @fd.nil?
+      not @file.nil?
+    end
+
+    def send_event(type, code, value = 0)
+      event = InputEvent.new
+      FFI::LibC.gettimeofday(event[:time], nil)
+      event[:type] = type
+      event[:code] = code
+      event[:value] = value
+      @file.syswrite(event.pointer.read_bytes(event.size))
+    end
+
+    def send_key_event(key, state: 1)
+      send_event(EV_KEY, UInput.const_get("KEY_#{map(key).upcase}"), state)
+    end
+
+    def send_syn_event
+      send_event(EV_SYN, SYN_REPORT)
     end
   end
 end

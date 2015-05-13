@@ -1,34 +1,25 @@
 require_relative 'device'
+require_relative 'keyboard/factory'
 
-module Uinput
+module UInput
   class Keyboard < Device
-    def press(key)
-      event = InputEvent.new
-      event[:time] = nil
-      event[:type] = EV_KEY
-      event[:code] = const_get("KEY_#{key.upcase}")
-      event[:value] = 1
-      @fd.write(event)
+    def press(keys)
+      keys.split('+').each do |key|
+        send_key_event(key, state: 1)
+      end
+      send_syn_event
     end
 
-    def release(key)
-      event = InputEvent.new
-      event[:time] = nil
-      event[:type] = EV_KEY
-      event[:code] = const_get("KEY_#{key.upcase}")
-      event[:value] = 0
-      @fd.write(event)
+    def release(keys)
+      keys.split('+').each do |key|
+        send_key_event(key, state: 0)
+      end
+      send_syn_event
     end
 
-    def tap(key)
-      press(key)
-      release(key)
-    end
-
-    def combo(keys)
-      keys = keys.split('+')
-      keys.each{ |key| press(key) }
-      keys.each{ |key| release(key) }
+    def tap(keys)
+      press(keys)
+      release(keys)
     end
 
     private
@@ -40,7 +31,7 @@ module Uinput
     }
 
     def map(key)
-      MAP[key.downcase.to_sym]
+      MAP[key.downcase.to_sym] || key
     end
   end
 end
