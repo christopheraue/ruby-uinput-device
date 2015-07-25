@@ -5,7 +5,7 @@ require 'uinput/device/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "uinput-device"
-  spec.version       = UInput::Device::VERSION
+  spec.version       = Uinput::Device::VERSION
   spec.authors       = ["Christopher Aue"]
   spec.email         = ["mail@christopheraue.net"]
 

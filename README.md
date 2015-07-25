@@ -1,4 +1,4 @@
-# UInput::Device
+# Uinput::Device
 
 Generic ruby wrapper around uinput to create devices.
 

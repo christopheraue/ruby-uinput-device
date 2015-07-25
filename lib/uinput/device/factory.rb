@@ -1,4 +1,4 @@
-module UInput
+module Uinput
   class Device
     class Factory
       def initialize(device, &block)

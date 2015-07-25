@@ -2,7 +2,7 @@ require 'uinput'
 require_relative "device/version"
 require_relative "device/factory"
 
-module UInput
+module Uinput
   class Device
     class << self
       def create(device = '/dev/uinput', &block)
