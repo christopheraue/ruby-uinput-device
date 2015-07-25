@@ -33,10 +33,6 @@ module UInput
       @file.syswrite(event.pointer.read_bytes(event.size))
     end
 
-    def send_key_event(key, state: 1)
-      send_event(EV_KEY, UInput.const_get("KEY_#{map(key).upcase}"), state)
-    end
-
     def send_syn_event
       send_event(EV_SYN, SYN_REPORT)
     end

@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Christopher Aue"]
   spec.email         = ["mail@christopheraue.net"]
 
-  spec.summary       = %q{Object wrapper for uinput to create devices}
+  spec.summary       = %q{Generic ruby wrapper around uinput to create devices.}
   spec.homepage      = "https://github.com/christopheraue/ruby-uinput-device"
   spec.license       = "MIT"
 

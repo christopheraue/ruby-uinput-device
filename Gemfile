@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
 gemspec
-gem 'uinput', path: '../uinput'
+gem 'uinput', path: '../ruby-uinput'
