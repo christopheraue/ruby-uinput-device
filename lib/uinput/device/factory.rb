@@ -1,8 +1,10 @@
 module Uinput
   class Device
-    class Factory
-      def initialize(device, &block)
-        @file = File.open(device, Fcntl::O_WRONLY | Fcntl::O_NDELAY)
+    class SystemInitializer
+      FILE = '/dev/uinput'
+
+      def initialize(&block)
+        @file = File.open(FILE, Fcntl::O_WRONLY | Fcntl::O_NDELAY)
         @device = UinputUserDev.new
 
         self.name = "Virtual Ruby Device"
@@ -55,9 +57,7 @@ module Uinput
 
       def create
         @file.syswrite(@device.pointer.read_bytes(@device.size))
-        if @file.ioctl(UI_DEV_CREATE).zero?
-          @file
-        end
+        @file if @file.ioctl(UI_DEV_CREATE).zero?
       end
     end
   end

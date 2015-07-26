@@ -5,15 +5,8 @@ require 'ffi/libc'
 
 module Uinput
   class Device
-    class << self
-      def create(device = '/dev/uinput', &block)
-        file = self::Factory.new(device, &block).create
-        new file unless file.nil?
-      end
-    end
-
-    def initialize(file)
-      @file = file
+    def initialize(&block)
+      @file = self.class::SystemInitializer.new(self, &block).create
     end
 
     def destroy
