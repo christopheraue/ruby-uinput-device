@@ -1,6 +1,7 @@
 require 'uinput'
 require_relative "device/version"
 require_relative "device/factory"
+require 'ffi/libc'
 
 module Uinput
   class Device
