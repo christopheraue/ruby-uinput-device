@@ -1,8 +1,8 @@
+require 'bundler/setup'
 require 'uinput'
 require_relative "device/version"
-require_relative "device/factory"
+require_relative "device/system_initializer"
 require_relative "device/error"
-require 'ffi/libc'
 
 module Uinput
   class Device
@@ -20,16 +20,13 @@ module Uinput
     end
 
     def send_event(type, code, value = 0)
-      event = InputEvent.new
-      FFI::LibC.gettimeofday(event[:time], nil)
-      event[:type] = type
-      event[:code] = code
+      event = LinuxInput::InputEvent.new
+      event[:time] = LinuxInput::Timeval.new
+      event[:time][:tv_sec] = Time.now.to_i
+      event[:type] = type.is_a?(Symbol) ? LinuxInput.const_get(type) : type
+      event[:code] = code.is_a?(Symbol) ? LinuxInput.const_get(code) : code
       event[:value] = value
       @file.syswrite(event.pointer.read_bytes(event.size))
-    end
-
-    def send_syn_event
-      send_event(EV_SYN, SYN_REPORT)
     end
   end
 end

@@ -3,17 +3,15 @@ module Uinput
     class SystemInitializer
       FILE = '/dev/uinput'
 
-      def initialize(&block)
+      def initialize(device, &block)
         @file = File.open(FILE, Fcntl::O_WRONLY | Fcntl::O_NDELAY)
         @device = UinputUserDev.new
 
         self.name = "Virtual Ruby Device"
-        self.type = BUS_VIRTUAL
+        self.type = LinuxInput::BUS_VIRTUAL
         self.vendor = 0
         self.product = 0
         self.version = 0
-
-        receive_syn_events
 
         instance_exec &block if block
       end
@@ -23,7 +21,7 @@ module Uinput
       end
 
       def type=(type)
-        @device[:id][:bustype] = type
+        @device[:id][:bustype] = type.is_a?(Symbol) ? LinuxInput.const_get(type) : type
       end
 
       def vendor=(vendor)
@@ -39,20 +37,12 @@ module Uinput
       end
 
       def add_key(key)
-        @file.ioctl(UI_SET_KEYBIT, key)
+        @file.ioctl(UI_SET_KEYBIT, key.is_a?(Symbol) ? LinuxInput.const_get(key) : key)
       end
       alias_method :add_button, :add_key
 
       def add_event(event)
-        @file.ioctl(UI_SET_EVBIT, event)
-      end
-
-      def receive_key_events
-        add_event(EV_KEY)
-      end
-
-      def receive_syn_events
-        add_event(EV_SYN)
+        @file.ioctl(UI_SET_EVBIT, event.is_a?(Symbol) ? LinuxInput.const_get(event) : event)
       end
 
       def create
