@@ -37,7 +37,7 @@ module Uinput
     end
 
     def name
-      File.read("#{sys_path}/name")
+      File.read("#{sys_path}/name").strip
     end
 
     def active?
