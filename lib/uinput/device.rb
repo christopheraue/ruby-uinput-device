@@ -36,6 +36,10 @@ module Uinput
       "/dev/input/#{event}"
     end
 
+    def name
+      File.read("#{sys_path}/name")
+    end
+
     def active?
       not @file.nil?
     end
