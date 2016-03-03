@@ -1,3 +1,5 @@
+require 'fcntl'
+
 module Uinput
   class Device
     class SystemInitializer
