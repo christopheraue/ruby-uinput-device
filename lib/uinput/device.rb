@@ -1,7 +1,7 @@
 require 'bundler/setup'
 require 'uinput'
 require_relative "device/version"
-require_relative "device/system_initializer"
+require_relative "device/initializer"
 require_relative "device/error"
 
 module Uinput
@@ -9,7 +9,7 @@ module Uinput
     SYS_INPUT_DIR = '/sys/devices/virtual/input/'
 
     def initialize(&block)
-      @file = self.class::SystemInitializer.new(self, &block).create
+      @file = self.class::Initializer.new(self, &block).create
     end
 
     def destroy
