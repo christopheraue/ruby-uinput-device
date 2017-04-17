@@ -1,5 +1,5 @@
-require 'bundler/setup'
 require 'uinput'
+
 require_relative "device/version"
 require_relative "device/initializer"
 require_relative "device/error"
@@ -10,34 +10,32 @@ module Uinput
 
     def initialize(&block)
       @file = self.class::Initializer.new(self, &block).create
+
+      @sysname = begin
+        name_len = 128
+        name_buffer = [' ' * name_len].pack("A#{name_len}")
+        @file.ioctl(Uinput.UI_GET_SYSNAME(name_len), name_buffer)
+        name_buffer.unpack("A#{name_len}").first
+      end
+
+      @sys_path = "#{SYS_INPUT_DIR}#{@sysname}"
+
+      @dev_path = begin
+        event_dir = Dir["#{@sys_path}/event*"].first
+        event = File.basename(event_dir)
+        "/dev/input/#{event}"
+      end
     end
+
+    attr_reader :file, :sysname, :sys_path, :dev_path
 
     def destroy
       @file.ioctl(UI_DEV_DESTROY, nil)
       @file = nil
     end
 
-    def sysname
-      @sysname ||= begin
-        name_len = 128
-        name_buffer = [' ' * name_len].pack("A#{name_len}")
-        @file.ioctl(Uinput.UI_GET_SYSNAME(name_len), name_buffer)
-        name_buffer.unpack("A#{name_len}").first
-      end
-    end
-
-    def sys_path
-      "#{SYS_INPUT_DIR}#{sysname}"
-    end
-
-    def dev_path
-      event_dir = Dir["#{sys_path}/event*"].first
-      event = File.basename(event_dir)
-      "/dev/input/#{event}"
-    end
-
     def name
-      File.read("#{sys_path}/name").strip
+      File.read("#{@sys_path}/name").strip
     end
 
     def active?
